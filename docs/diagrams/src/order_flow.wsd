@@ -1,4 +1,6 @@
-@startuml Заказ состояния
+@startuml Граф состояний заказа
+
+skinparam linetype ortho
 
 hide empty description
 state store {
@@ -9,10 +11,15 @@ state store {
 
 state MES {
     state PRICE_CALCULATED
+    state MANUFACTURING_STARTED
+    state MANUFACTURING_COMPLETED
+    state PACKAGING
+    state SHIPPED
 }
 
 state CRM {
     state MANUFACTURING_APPROVED
+    state CLOSED
 }
 
 [*] --> INITIATED
