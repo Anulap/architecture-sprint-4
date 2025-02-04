@@ -1,0 +1,33 @@
+@startuml Диаграмма последовательности для действий со статусом заказа
+actor Operator as Op
+participant MES as Mes
+participant Cache as Cch
+participant "Transactional\nOutbox" as To 
+participant DB as Db
+
+== Чтение ==
+Op -> Mes: Запрос списка заказов
+
+alt cache hit
+    Mes -> Cch: Чтение списка заказов
+else cache miss
+    Mes -> Db: Чтение списка заказов
+end
+
+Mes -> Op: Возврат списка заказов
+== Запись ==
+Op -> Mes: Запрос на изменение заказа
+Mes -> Cch: Запрос на изменение заказа
+group atomic
+    Cch -> Cch: Изменение заказа
+    Cch -> To: Добавление запроса на измененеи DB
+end
+par
+    Cch -> Mes: Возврат статуса операции
+    Mes -> Op: Возврат статуса операции
+else
+    loop until successful
+        To -> Db: Изменение заказа
+    end
+end
+@enduml
